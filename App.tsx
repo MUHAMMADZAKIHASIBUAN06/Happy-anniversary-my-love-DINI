@@ -13,14 +13,13 @@ import {
 import GiftBox from './components/GiftBox';
 import LoveRain from './components/LoveRain';
 import FloatingHearts from './components/FloatingHearts';
-import CuteDoll, { CuteDollLeft } from './components/CuteDoll';
 import { 
   Heart, 
   ChevronRight, 
   ChevronLeft, 
   Send, 
   MessageCircle, 
-  ImageIcon, 
+  Image as LucideImage, 
   Sparkles, 
   Star, 
   User, 
@@ -41,7 +40,9 @@ export default function App() {
 
   const handleStart = () => {
     if (audioRef.current) {
-      audioRef.current.play().catch(e => console.log("Audio play blocked:", e));
+      audioRef.current.play().catch(() => {
+        console.log("Audio play blocked by browser policy");
+      });
     }
     setCurrentPage(Page.INTRO);
   };
@@ -51,52 +52,53 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
-  // HALAMAN BALASAN: Render terpisah untuk stabilitas maksimal
+  // HALAMAN BALASAN: Render terpisah untuk stabilitas maksimal saat mengetik
   if (currentPage === Page.REPLY) {
     return (
-      <div className="fixed inset-0 z-[100] bg-pink-50 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl flex flex-col h-[85vh] overflow-hidden border-2 border-pink-100">
-          {/* Header Chat - Statis & Rigid */}
-          <div className="bg-pink-500 p-4 flex items-center gap-4 text-white shrink-0">
+      <div className="fixed inset-0 z-[100] bg-pink-50 flex flex-col items-center justify-center p-4 animate-page-enter">
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          <FloatingHearts />
+        </div>
+        
+        <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl flex flex-col h-[85vh] max-h-[700px] overflow-hidden border-4 border-white relative z-10">
+          <div className="bg-pink-500 p-5 flex items-center gap-4 text-white shrink-0">
             <button 
               onClick={() => setCurrentPage(Page.FINAL)} 
-              className="p-2 hover:bg-pink-600 rounded-full transition-colors"
+              className="p-2 hover:bg-pink-600 rounded-full transition-colors active:scale-90"
+              aria-label="Kembali"
             >
               <ArrowLeft size={24} />
             </button>
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-500 shadow-sm">
-              <User size={20} />
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-500 shadow-sm shrink-0">
+              <User size={22} />
             </div>
-            <div className="text-left">
-              <p className="font-bold text-base leading-tight">Sayangku ❤️</p>
-              <p className="text-[10px] opacity-80 uppercase tracking-tighter">Membalas pesan indahmu...</p>
+            <div className="text-left overflow-hidden">
+              <p className="font-bold text-lg leading-tight truncate">Sayangku ❤️</p>
+              <p className="text-[10px] opacity-80 uppercase tracking-widest font-black">Membalas pesan...</p>
             </div>
           </div>
 
-          {/* Chat Body - Background statis */}
-          <div className="flex-1 p-5 bg-white overflow-hidden flex flex-col">
-            <div className="self-start bg-pink-50 text-pink-800 p-4 rounded-2xl rounded-tl-none max-w-[90%] mb-6 shadow-sm border border-pink-100">
+          <div className="flex-1 flex flex-col p-6 bg-white overflow-hidden">
+            <div className="self-start bg-pink-50 text-pink-800 p-4 rounded-2xl rounded-tl-none max-w-[90%] mb-6 shadow-sm border border-pink-100 shrink-0">
               <p className="text-sm font-medium italic">"Tuliskan balasanmu di bawah ya, Sayang. Nanti otomatis terkirim ke WhatsApp aku! ✨"</p>
             </div>
 
-            {/* Area Input - Sangat Rigid & Stabil */}
-            <div className="flex-1 w-full bg-pink-50/30 rounded-2xl border-2 border-pink-100 p-2">
+            <div className="flex-1 w-full bg-pink-50/20 rounded-2xl border-2 border-pink-100 p-1 flex flex-col">
               <textarea 
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
-                placeholder="Tulis di sini..."
-                className="w-full h-full bg-transparent outline-none p-3 text-pink-900 resize-none text-lg font-medium placeholder:text-pink-300"
+                placeholder="Ketik pesan manismu..."
+                className="flex-1 w-full bg-transparent outline-none p-4 text-pink-900 resize-none text-lg font-medium placeholder:text-pink-200"
                 autoFocus
               />
             </div>
           </div>
 
-          {/* Action Button - Statis */}
-          <div className="p-4 bg-white border-t border-pink-50 shrink-0">
+          <div className="p-6 bg-white border-t border-pink-50 shrink-0">
             <button 
               onClick={handleSendWA}
               disabled={!replyText.trim()}
-              className="w-full bg-pink-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 disabled:bg-pink-200 transition-colors shadow-md active:bg-pink-600"
+              className="w-full bg-pink-500 hover:bg-pink-600 active:bg-pink-700 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-3 disabled:bg-pink-200 disabled:text-pink-400 transition-colors shadow-lg shadow-pink-200"
             >
               Kirim ke WhatsApp <Send size={20} />
             </button>
@@ -117,8 +119,6 @@ export default function App() {
         <>
           <LoveRain />
           <FloatingHearts />
-          <CuteDoll />
-          <CuteDollLeft />
           <div className="fixed inset-0 pointer-events-none z-10">
             {[...Array(12)].map((_, i) => (
               <div 
@@ -138,10 +138,10 @@ export default function App() {
       )}
 
       {/* Konten Halaman Utama */}
-      <div className="animate-slide-up min-h-screen w-full flex flex-col items-center justify-center p-6 text-center z-30 relative">
+      <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 text-center z-30 relative">
         
         {currentPage === Page.GIFT && (
-          <div className="text-center relative">
+          <div key="gift-page" className="text-center relative animate-page-enter">
             <h1 className="text-5xl sm:text-7xl font-romantic text-pink-600 mb-16 drop-shadow-2xl animate-float">
               Special Gift for You... ✨
             </h1>
@@ -152,7 +152,7 @@ export default function App() {
         )}
 
         {currentPage === Page.INTRO && (
-          <div className="max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl border-4 border-white relative overflow-hidden">
+          <div key="intro-page" className="max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl border-4 border-white relative overflow-hidden animate-page-enter">
             <div className="absolute top-0 right-0 p-4">
               <Sparkles className="text-yellow-400 w-8 h-8 animate-spin" style={{ animationDuration: '5s' }} />
             </div>
@@ -177,7 +177,7 @@ export default function App() {
         )}
 
         {currentPage === Page.GOMBALAN && (
-          <div className="max-w-md w-full bg-white/95 backdrop-blur-md p-6 rounded-[3rem] shadow-2xl border-2 border-pink-100">
+          <div key={`gombalan-${gombalanIndex}`} className="max-w-md w-full bg-white/95 backdrop-blur-md p-6 rounded-[3rem] shadow-2xl border-2 border-pink-100 animate-page-enter">
             <div className="relative overflow-hidden rounded-[2rem] mb-6 aspect-square shadow-md">
               <img 
                 src={GOMBALAN_LIST[gombalanIndex].image} 
@@ -220,9 +220,9 @@ export default function App() {
         )}
 
         {currentPage === Page.GALLERY && (
-          <div className="max-w-4xl w-full bg-white/95 backdrop-blur-md p-8 rounded-[3.5rem] shadow-2xl border-4 border-white overflow-hidden">
+          <div key="gallery-page" className="max-w-4xl w-full bg-white/95 backdrop-blur-md p-8 rounded-[3.5rem] shadow-2xl border-4 border-white overflow-hidden animate-page-enter">
             <div className="flex flex-col items-center mb-6">
-              <ImageIcon className="text-pink-600 w-8 h-8 mb-2" />
+              <LucideImage className="text-pink-600 w-8 h-8 mb-2" />
               <h2 className="text-4xl font-romantic text-pink-600">Our Gallery ✨</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8 max-h-[45vh] overflow-y-auto p-3 custom-scrollbar bg-pink-50/30 rounded-2xl">
@@ -249,7 +249,7 @@ export default function App() {
         )}
 
         {currentPage === Page.FINAL && (
-          <div className="max-w-lg bg-white/98 backdrop-blur-2xl p-10 rounded-[4rem] shadow-2xl border-8 border-pink-50 relative overflow-hidden">
+          <div key="final-page" className="max-w-lg bg-white/98 backdrop-blur-2xl p-10 rounded-[4rem] shadow-2xl border-8 border-pink-50 relative overflow-hidden animate-page-enter">
             <h2 className="text-4xl sm:text-5xl font-romantic text-pink-600 mb-8">Happy Anniversary! 🌹</h2>
             <div className="text-lg text-pink-900 leading-relaxed mb-10 text-left italic border-l-4 border-pink-200 pl-6 whitespace-pre-line font-medium">
               {FUTURE_HOPES}
